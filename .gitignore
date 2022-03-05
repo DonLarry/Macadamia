@@ -33,3 +33,16 @@
 
 # IDE files
 .vscode
+
+# Flex build files
+lexer.cpp
+
+# Bison build files
+location.hh
+parser.tab.cc
+parser.tab.hh
+position.hh
+stack.hh
+
+# Text files
+*.txt
