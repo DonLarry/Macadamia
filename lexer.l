@@ -149,7 +149,6 @@ RARROW            "->"
 
 {WHITESPACE}      {}
 {NEWLINE}         {return yy::parser::make_NEWLINE(loc);}
-
 {PLUS}            {return yy::parser::make_PLUS(loc);}
 {MINUS}           {return yy::parser::make_MINUS(loc);}
 {STAR}            {return yy::parser::make_STAR(loc);}
