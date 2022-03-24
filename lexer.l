@@ -52,7 +52,8 @@ YIELD           "yield"
 DIGIT [0-9]
 CHARACTER [a-zA-ZñÑ]
 
-NUMBER          {DIGIT}+("."{DIGIT}+)?
+NUMBER          {DIGIT}+  
+NPFLOAT         {DIGIT}+("."{DIGIT}+)?
 IDENTIFIER      ({CHARACTER}|"_")({CHARACTER}|{DIGIT}|"_")*
 COMMENTS        #[^\n]*
 STRING          \"[^\n"]*\"
@@ -107,6 +108,7 @@ RARROW            "->"
 
 {COMMENTS}        {}
 {NUMBER}          {return yy::parser::make_NUMBER(strtol(yytext, NULL, 10), loc);}
+{NPFLOAT}         {return yy::parser::make_NPFLOAT(strtol(yytext, NULL, 10), loc);}
 
 {FALSE}           {return yy::parser::make_FALSE(yytext, loc);}    
 {AWAIT}           {return yy::parser::make_AWAIT(yytext, loc);}    

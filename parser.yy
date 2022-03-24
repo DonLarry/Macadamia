@@ -58,7 +58,8 @@
 %token <std::string>  OR        "or"         
 %token <std::string>  YIELD     "yield"
 
-%token <float>        NUMBER    "num"
+%token <int>          NUMBER     "num"
+%token <float>        NPFLOAT    "pfnum"
 %token <std::string>  IDENTIFIER "id"
 %token <std::string>  STRING 
 
@@ -108,26 +109,28 @@
 %token                END 0 "eof"
 
 //Listado de No Terminales
-%type <float> E
-%type <float> T
-%type <float> F
+%type F
+%type T
+%type O
 
 %printer { yyoutput << $$; } <*>;
 
 %%
 %start S;
 
-S : E;
+S : O F;
 
-E : E "+" T
-   |E "-" T
+F : NEWLINE | F O | LAMBDA;
+
+T : "pfnum"
+    |"num";
+
+O : O "+" O
+   |O "-" O
+   |O "*" O
+   |O "/" O
    |T;
 
-T : T "*" F
-   |T "/" F
-   |F;
-   
-F : "num";
 %%
 
 void yy::parser::error(const location_type& location, const std::string& error)
