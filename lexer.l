@@ -55,7 +55,7 @@ CHARACTER [a-zA-ZñÑ]
 NUMBER          {DIGIT}+  
 NPFLOAT         {DIGIT}+("."{DIGIT}+)?
 IDENTIFIER      ({CHARACTER}|"_")({CHARACTER}|{DIGIT}|"_")*
-COMMENTS        #[^\n]*
+COMMENT        #[^\n]*
 STRING          \"[^\n"]*\"
 
 /*Operadores, delimitadores*/
@@ -106,45 +106,45 @@ RARROW            "->"
 
 %%
 
-{COMMENTS}        {}
+{COMMENT}        {}
 {NUMBER}          {return yy::parser::make_NUMBER(strtol(yytext, NULL, 10), loc);}
 {NPFLOAT}         {return yy::parser::make_NPFLOAT(strtol(yytext, NULL, 10), loc);}
 
-{FALSE}           {return yy::parser::make_FALSE(yytext, loc);}    
-{AWAIT}           {return yy::parser::make_AWAIT(yytext, loc);}    
-{ELSE}            {return yy::parser::make_ELSE(yytext, loc);}      
-{IMPORT}          {return yy::parser::make_IMPORT(yytext, loc);}   
-{PASS}            {return yy::parser::make_PASS(yytext, loc);}
-{NONE}            {return yy::parser::make_NONE(yytext, loc);}     
-{BREAK}           {return yy::parser::make_BREAK(yytext, loc);}     
-{EXCEPT}          {return yy::parser::make_EXCEPT(yytext, loc);}    
-{IN}              {return yy::parser::make_IN(yytext, loc);}    
-{RAISE}           {return yy::parser::make_RAISE(yytext, loc);}
-{TRUE}            {return yy::parser::make_TRUE(yytext, loc);}    
-{CLASS}           {return yy::parser::make_CLASS(yytext, loc);}    
-{FINALLY}         {return yy::parser::make_FINALLY(yytext, loc);}    
-{IS}              {return yy::parser::make_IS(yytext, loc);}      
-{RETURN}          {return yy::parser::make_RETURN(yytext, loc);}
-{AND}             {return yy::parser::make_AND(yytext, loc);}     
-{CONTINUE}        {return yy::parser::make_CONTINUE(yytext, loc);}  
-{FOR}             {return yy::parser::make_FOR(yytext, loc);}      
-{LAMBDA}          {return yy::parser::make_LAMBDA(yytext, loc);}   
-{TRY}             {return yy::parser::make_TRY(yytext, loc);}
-{AS}              {return yy::parser::make_AS(yytext, loc);}       
-{DEF}             {return yy::parser::make_DEF(yytext, loc);}
-{FROM}            {return yy::parser::make_FROM(yytext, loc);}
-{NONLOCAL}        {return yy::parser::make_NONLOCAL(yytext, loc);}
-{WHILE}           {return yy::parser::make_WHILE(yytext, loc);}
-{ASSERT}          {return yy::parser::make_ASSERT(yytext, loc);} 
-{DEL}             {return yy::parser::make_DEL(yytext, loc);}
-{GLOBAL}          {return yy::parser::make_GLOBAL(yytext, loc);}
-{NOT}             {return yy::parser::make_NOT(yytext, loc);}
-{WITH}            {return yy::parser::make_WITH(yytext, loc);}
-{ASYNC}           {return yy::parser::make_ASYNC(yytext, loc);}
-{ELIF}            {return yy::parser::make_ELIF(yytext, loc);}
-{IF}              {return yy::parser::make_IF(yytext, loc);}
-{OR}              {return yy::parser::make_OR(yytext, loc);}
-{YIELD}           {return yy::parser::make_YIELD(yytext, loc);}
+{FALSE}           {return yy::parser::make_FALSE(loc);}    
+{AWAIT}           {return yy::parser::make_AWAIT(loc);}    
+{ELSE}            {return yy::parser::make_ELSE(loc);}      
+{IMPORT}          {return yy::parser::make_IMPORT(loc);}   
+{PASS}            {return yy::parser::make_PASS(loc);}
+{NONE}            {return yy::parser::make_NONE(loc);}     
+{BREAK}           {return yy::parser::make_BREAK(loc);}     
+{EXCEPT}          {return yy::parser::make_EXCEPT(loc);}    
+{IN}              {return yy::parser::make_IN(loc);}    
+{RAISE}           {return yy::parser::make_RAISE(loc);}
+{TRUE}            {return yy::parser::make_TRUE(loc);}    
+{CLASS}           {return yy::parser::make_CLASS(loc);}    
+{FINALLY}         {return yy::parser::make_FINALLY(loc);}    
+{IS}              {return yy::parser::make_IS(loc);}      
+{RETURN}          {return yy::parser::make_RETURN(loc);}
+{AND}             {return yy::parser::make_AND(loc);}     
+{CONTINUE}        {return yy::parser::make_CONTINUE(loc);}  
+{FOR}             {return yy::parser::make_FOR(loc);}      
+{LAMBDA}          {return yy::parser::make_LAMBDA(loc);}   
+{TRY}             {return yy::parser::make_TRY(loc);}
+{AS}              {return yy::parser::make_AS(loc);}       
+{DEF}             {return yy::parser::make_DEF(loc);}
+{FROM}            {return yy::parser::make_FROM(loc);}
+{NONLOCAL}        {return yy::parser::make_NONLOCAL(loc);}
+{WHILE}           {return yy::parser::make_WHILE(loc);}
+{ASSERT}          {return yy::parser::make_ASSERT(loc);} 
+{DEL}             {return yy::parser::make_DEL(loc);}
+{GLOBAL}          {return yy::parser::make_GLOBAL(loc);}
+{NOT}             {return yy::parser::make_NOT(loc);}
+{WITH}            {return yy::parser::make_WITH(loc);}
+{ASYNC}           {return yy::parser::make_ASYNC(loc);}
+{ELIF}            {return yy::parser::make_ELIF(loc);}
+{IF}              {return yy::parser::make_IF(loc);}
+{OR}              {return yy::parser::make_OR(loc);}
+{YIELD}           {return yy::parser::make_YIELD(loc);}
 
 {IDENTIFIER}      {return yy::parser::make_IDENTIFIER(yytext, loc);}
 {STRING}          {return yy::parser::make_STRING(yytext, loc);}
@@ -173,25 +173,25 @@ RARROW            "->"
 {RBRACE}          {return yy::parser::make_RBRACE(loc);}
 {TILDE}           {return yy::parser::make_TILDE(loc);}
 {CIRCUMFLEX}      {return yy::parser::make_CIRCUMFLEX(loc);}
-{EQEQUAL}         {return yy::parser::make_EQEQUAL(yytext, loc);}
-{NOTEQUAL}        {return yy::parser::make_NOTEQUAL(yytext, loc);}
-{LESSEQUAL}       {return yy::parser::make_LESSEQUAL(yytext, loc);}
-{GREATEREQUAL}    {return yy::parser::make_GREATEREQUAL(yytext, loc);}
-{DOUBLESTAR}      {return yy::parser::make_DOUBLESTAR(yytext, loc);}
-{PLUSEQUAL}       {return yy::parser::make_PLUSEQUAL(yytext, loc);}
-{MINEEQUAL}       {return yy::parser::make_MINEEQUAL(yytext, loc);}
-{STAREQUAL}       {return yy::parser::make_STAREQUAL(yytext, loc);}
-{SLASHEQUAL}      {return yy::parser::make_SLASHEQUAL(yytext, loc);}
-{PERCENTEQUAL}    {return yy::parser::make_PERCENTEQUAL(yytext, loc);}
-{AMPEREQUAL}      {return yy::parser::make_AMPEREQUAL(yytext, loc);}
-{VBAREQUAL}       {return yy::parser::make_VBAREQUAL(yytext, loc);}
-{CIRCUMFLEXEQUAL} {return yy::parser::make_CIRCUMFLEXEQUAL(yytext, loc);}
-{LEFTSHIFTEQUAL}  {return yy::parser::make_LEFTSHIFTEQUAL(yytext,loc);}
-{RIGHTSHIFTEQUAL} {return yy::parser::make_RIGHTSHIFTEQUAL(yytext,loc);}
-{DOUBLESTAREQUAL} {return yy::parser::make_DOUBLESTAREQUAL(yytext,loc);}
-{DOUBLESLASH}     {return yy::parser::make_DOUBLESLASH(yytext,loc);}
-{DOUBLESLASHEQUAL} {return yy::parser::make_DOUBLESLASHEQUAL(yytext,loc);}
-{RARROW}          {return yy::parser::make_RARROW(yytext,loc);}
+{EQEQUAL}         {return yy::parser::make_EQEQUAL(loc);}
+{NOTEQUAL}        {return yy::parser::make_NOTEQUAL(loc);}
+{LESSEQUAL}       {return yy::parser::make_LESSEQUAL(loc);}
+{GREATEREQUAL}    {return yy::parser::make_GREATEREQUAL(loc);}
+{DOUBLESTAR}      {return yy::parser::make_DOUBLESTAR(loc);}
+{PLUSEQUAL}       {return yy::parser::make_PLUSEQUAL(loc);}
+{MINEEQUAL}       {return yy::parser::make_MINEEQUAL(loc);}
+{STAREQUAL}       {return yy::parser::make_STAREQUAL(loc);}
+{SLASHEQUAL}      {return yy::parser::make_SLASHEQUAL(loc);}
+{PERCENTEQUAL}    {return yy::parser::make_PERCENTEQUAL(loc);}
+{AMPEREQUAL}      {return yy::parser::make_AMPEREQUAL(loc);}
+{VBAREQUAL}       {return yy::parser::make_VBAREQUAL(loc);}
+{CIRCUMFLEXEQUAL} {return yy::parser::make_CIRCUMFLEXEQUAL(loc);}
+{LEFTSHIFTEQUAL}  {return yy::parser::make_LEFTSHIFTEQUAL(loc);}
+{RIGHTSHIFTEQUAL} {return yy::parser::make_RIGHTSHIFTEQUAL(loc);}
+{DOUBLESTAREQUAL} {return yy::parser::make_DOUBLESTAREQUAL(loc);}
+{DOUBLESLASH}     {return yy::parser::make_DOUBLESLASH(loc);}
+{DOUBLESLASHEQUAL} {return yy::parser::make_DOUBLESLASHEQUAL(loc);}
+{RARROW}          {return yy::parser::make_RARROW(loc);}
 
 .                 {std::cerr << "LEXICAL ERROR " << yytext << std::endl;}
 <<EOF>>           {return yy::parser::make_END(loc);}
