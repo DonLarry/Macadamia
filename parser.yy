@@ -24,43 +24,44 @@
 //Listado de Terminales
 %token  FALSE     "False"
 %token  AWAIT     "await"
-%token  ELSE      "else"       
-%token  IMPORT    "import"    
+%token  ELSE      "else"
+%token  IMPORT    "import"
 %token  PASS      "pass"
-%token  NONE      "None"       
-%token  BREAK     "break"      
-%token  EXCEPT    "except"     
-%token  IN        "in"         
+%token  NONE      "None"
+%token  BREAK     "break"
+%token  EXCEPT    "except"
+%token  IN        "in"
 %token  RAISE     "raise"
-%token  TRUE      "True"       
-%token  CLASS     "class"      
-%token  FINALLY   "finally"    
-%token  IS        "is"         
+%token  TRUE      "True"
+%token  CLASS     "class"
+%token  FINALLY   "finally"
+%token  IS        "is"
 %token  RETURN    "return"
-%token  AND       "and"        
-%token  CONTINUE  "continue"   
-%token  FOR       "for"        
-%token  LAMBDA    "lambda"     
+%token  AND       "and"
+%token  CONTINUE  "continue"
+%token  FOR       "for"
+%token  LAMBDA    "lambda"
 %token  TRY       "try"
-%token  AS        "as"         
-%token  DEF       "def"        
-%token  FROM      "from"       
-%token  NONLOCAL  "nonlocal"   
+%token  AS        "as"
+%token  DEF       "def"
+%token  FROM      "from"
+%token  NONLOCAL  "nonlocal"
 %token  WHILE     "while"
-%token  ASSERT    "assert"     
-%token  DEL       "del"        
-%token  GLOBAL    "global"     
-%token  NOT       "not"        
+%token  ASSERT    "assert"
+%token  DEL       "del"
+%token  GLOBAL    "global"
+%token  NOT       "not"
 %token  WITH      "with"
-%token  ASYNC     "async"      
-%token  ELIF      "elif"       
-%token  IF        "if"         
-%token  OR        "or"         
+%token  ASYNC     "async"
+%token  ELIF      "elif"
+%token  IF        "if"
+%token  OR        "or"
 %token  YIELD     "yield"
 
 %token <int>          NUMBER     "num"
 %token <float>        NPFLOAT    "pfnum"
 %token <std::string>  IDENTIFIER "id"
+%token                COMMENT
 %token <std::string>  STRING 
 
 %token  NEWLINE
@@ -71,7 +72,7 @@
 %token  LPAR      "("
 %token  RPAR      ")"
 %token  LSQB      "["
-%token  RSQB      "]"		
+%token  RSQB      "]"
 %token  COLON     ":"
 %token  SEMI      ";"
 %token  COMMA     ","
@@ -89,7 +90,7 @@
 %token  EQEQUAL   "=="
 %token  NOTEQUAL  "!="
 %token  LESSEQUAL "<="
-%token  GREATEREQUAL ">=" 
+%token  GREATEREQUAL ">="
 %token  DOUBLESTAR   "**"
 %token  PLUSEQUAL    "+="
 %token  MINEEQUAL    "-="
@@ -109,9 +110,12 @@
 %token  END 0 "eof"
 
 //Listado de No Terminales
-%type F
-%type T
-%type O
+%type Expressions
+%type Expression
+%type Operation
+%type Number
+%type Operator
+%type Space
 
 %printer { yyoutput << $$; } <*>;
 
