@@ -53,7 +53,7 @@ DIGIT [0-9]
 CHARACTER [a-zA-ZñÑ]
 
 NUMBER          {DIGIT}+
-NPFLOAT         {DIGIT}+("."{DIGIT}+)?
+NPFLOAT         {DIGIT}+"."{DIGIT}*
 IDENTIFIER      ({CHARACTER}|"_")({CHARACTER}|{DIGIT}|"_")*
 COMMENT        #[^\n]*
 STRING          \"[^\n"]*\"
@@ -106,7 +106,7 @@ RARROW            "->"
 
 %%
 
-{COMMENT}        {}
+{COMMENT}         {}
 {NUMBER}          {return yy::parser::make_NUMBER(strtol(yytext, NULL, 10), loc);}
 {NPFLOAT}         {return yy::parser::make_NPFLOAT(strtol(yytext, NULL, 10), loc);}
 
