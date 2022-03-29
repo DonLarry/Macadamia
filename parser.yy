@@ -120,22 +120,32 @@
 %printer { yyoutput << $$; } <*>;
 
 %%
-%start S;
+%start Expressions;
 
+Expressions : %empty
+            | Expression Space Expressions
+;
 
-S : F;
+Space : NEWLINE
+      | END
+;
 
-F : NEWLINE F | O F | NEWLINE | %empty;
+Expression : Operation
+;
 
-T : "pfnum"
-    |"num";
+Operation : Number Operator Operation
+          | Number
+;
 
-O : O "+" O
-   |O "-" O
-   |O "*" O
-   |O "/" O
-   |T;
+Operator : PLUS
+         | MINUS
+         | STAR
+         | SLASH
+;
 
+Number : NUMBER
+       | NPFLOAT
+;
 %%
 
 void yy::parser::error(const location_type& location, const std::string& error)
