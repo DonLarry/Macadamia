@@ -108,7 +108,7 @@ RARROW            "->"
 
 {COMMENT}         {}
 {NUMBER}          {return yy::parser::make_NUMBER(strtol(yytext, NULL, 10), loc);}
-{NPFLOAT}         {return yy::parser::make_NPFLOAT(strtol(yytext, NULL, 10), loc);}
+{NPFLOAT}         {return yy::parser::make_NPFLOAT(std::stof(yytext), loc);}
 
 {FALSE}           {return yy::parser::make_FALSE(loc);}    
 {AWAIT}           {return yy::parser::make_AWAIT(loc);}    
