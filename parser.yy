@@ -63,7 +63,7 @@
 %token <float>        NPFLOAT    "pfnum"
 %token <std::string>  IDENTIFIER "id"
 %token                COMMENT
-%token <std::string>  STRING 
+%token <std::string>  STRING
 
 %token  NEWLINE
 %token  PLUS      "+"
@@ -83,7 +83,7 @@
 %token  GREATER   ">"
 %token  EQUAL     "="
 %token  DOT       "."
-%token  PORCENT   "%"
+%token  PERCENT   "%"
 %token  LBRACE    "{"
 %token  RBRACE    "}"
 %token  TILDE     "~"
@@ -110,6 +110,10 @@
 
 %token  END 0 "eof"
 
+
+%left PLUS MINUS
+%left STAR SLASH PERCENT
+
 //Listado de No Terminales
 /* %type Expressions */
 %type <Expression*> Expression
@@ -135,23 +139,25 @@ PossibleExpression:
   NEWLINE
 ;
 
-Expression :
+Expression:
   Operation
   {
     std::cout << "Expression -> Operation (";
     $1->printValue();
-    std::cout << ")\n"; ;
+    std::cout << ")\n";
   }
 ;
 
-Operation : Number
-          | Operation Operator Number
-;
-
-Operator : PLUS
-         | MINUS
-         | STAR
-         | SLASH
+Operation:
+  Number
+|
+  Operation PLUS Number {$$ = $1 + $3;}
+|
+  Operation MINUS Number {$$ = $1 - $3;}
+|
+  Operation STAR Number {$$ = $1 * $3;}
+|
+  Operation SLASH Number {$$ = $1 / $3;}
 ;
 
 Number :

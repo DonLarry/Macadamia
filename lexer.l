@@ -78,7 +78,7 @@ LESS              "<"
 GREATER           ">"
 EQUAL             [=]
 DOT               [.]
-PORCENT           [%]
+PERCENT           [%]
 LBRACE            "{"
 RBRACE            "}"
 TILDE             [~]
@@ -168,7 +168,7 @@ RARROW            "->"
 {GREATER}         {return yy::parser::make_GREATER(loc);}
 {EQUAL}           {return yy::parser::make_EQUAL(loc);}
 {DOT}             {return yy::parser::make_DOT(loc);}
-{PORCENT}         {return yy::parser::make_PORCENT(loc);}
+{PERCENT}         {return yy::parser::make_PERCENT(loc);}
 {LBRACE}          {return yy::parser::make_LBRACE(loc);}
 {RBRACE}          {return yy::parser::make_RBRACE(loc);}
 {TILDE}           {return yy::parser::make_TILDE(loc);}

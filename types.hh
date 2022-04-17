@@ -32,5 +32,16 @@ struct FloatNumber : Number
   FloatNumber(float value) : value(value) {}
 };
 
+FloatNumber* operator+(const FloatNumber& f, const IntegerNumber& i)
+{
+  return new FloatNumber(f.value + i.value);
+}
+
+FloatNumber* operator+(const IntegerNumber& i, const FloatNumber& f)
+{
+  return new FloatNumber(i.value + f.value);
+}
+
+
 
 #endif // TYPES_HH
