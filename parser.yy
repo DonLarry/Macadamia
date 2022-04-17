@@ -6,6 +6,7 @@
 %define parse.assert
 %code requires
 {
+  #include "types.hh"
   #include <string>
   #include <stdio.h>
   class driver;
@@ -110,31 +111,43 @@
 %token  END 0 "eof"
 
 //Listado de No Terminales
-%type Expressions
-%type Expression
-%type Operation
-%type Number
-%type Operator
-%type Space
+/* %type Expressions */
+%type <Expression*> Expression
+%type <Number*> Operation
+%type <Number*> Number
+/* %type Operator */
+/* %type Space */
 
 %printer { yyoutput << $$; } <*>;
 
 %%
 %start Expressions;
 
-Expressions : %empty
-            | Expression Space Expressions
+Expressions :
+  END
+|
+  Expression
+  {
+    printf("Expressions -> Expression\n");
+  }
+|
+  Expressions NEWLINE Expression
+  {
+    printf("Expressions -> Expressions NEWLINE Expression\n");
+  }
 ;
 
-Space : NEWLINE
-      | END
+Expression :
+  Operation
+  {
+    std::cout << "Expression -> Operation (";
+    $1->printValue();
+    std::cout << ")\n"; ;
+  }
 ;
 
-Expression : Operation
-;
-
-Operation : Number Operator Operation
-          | Number
+Operation : Number
+          | Operation Operator Number
 ;
 
 Operator : PLUS
@@ -143,8 +156,18 @@ Operator : PLUS
          | SLASH
 ;
 
-Number : NUMBER
-       | NPFLOAT
+Number :
+  NUMBER
+  {
+    $$ = new IntegerNumber($1);
+    std::cout << "Number -> NUMBER (" << $1 << ")\n";
+  }
+|
+NPFLOAT
+  {
+    $$ = new FloatNumber($1);
+    std::cout << "Number -> NPFLOAT (" << $1 << ")\n";
+  }
 ;
 %%
 
