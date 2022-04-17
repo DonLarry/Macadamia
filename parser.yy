@@ -123,18 +123,16 @@
 %%
 %start Expressions;
 
-Expressions :
-  END
+Expressions:
+  %empty
 |
+  Expressions PossibleExpression
+;
+
+PossibleExpression:
   Expression
-  {
-    printf("Expressions -> Expression\n");
-  }
 |
-  Expressions NEWLINE Expression
-  {
-    printf("Expressions -> Expressions NEWLINE Expression\n");
-  }
+  NEWLINE
 ;
 
 Expression :
