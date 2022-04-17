@@ -32,16 +32,88 @@ struct FloatNumber : Number
   FloatNumber(float value) : value(value) {}
 };
 
-FloatNumber* operator+(const FloatNumber& f, const IntegerNumber& i)
+//###################### operator+ #########################################
+IntegerNumber* operator+(const IntegerNumber& i, const IntegerNumber& i1)
+{
+  return new IntegerNumber(i.value + i1.value);
+}
+
+FloatNumber* operator+(const FloatNumber& f, const FloatNumber& f1)
+{
+  return new FloatNumber(f.value + f1.value);
+}
+
+/*FloatNumber* operator+(const FloatNumber& f, const IntegerNumber& i)
 {
   return new FloatNumber(f.value + i.value);
-}
+}*/
 
 FloatNumber* operator+(const IntegerNumber& i, const FloatNumber& f)
 {
   return new FloatNumber(i.value + f.value);
 }
 
+//###################### operator- #########################################
+IntegerNumber* operator-(const IntegerNumber& i, const IntegerNumber& i1)
+{
+  return new IntegerNumber(i.value - i1.value);
+}
 
+FloatNumber* operator-(const FloatNumber& f, const FloatNumber& f1)
+{
+  return new FloatNumber(f.value - f1.value);
+}
+
+/*FloatNumber* operator-(const FloatNumber& f, const IntegerNumber& i)
+{
+  return new FloatNumber(f.value - i.value);
+}*/
+
+FloatNumber* operator-(const IntegerNumber& i, const FloatNumber& f)
+{
+  return new FloatNumber(i.value - f.value);
+}
+
+//###################### operator* #########################################
+IntegerNumber* operator*(const IntegerNumber& i, const IntegerNumber& i1)
+{
+  return new IntegerNumber(i.value * i1.value);
+}
+
+FloatNumber* operator*(const FloatNumber& f, const FloatNumber& f1)
+{
+  return new FloatNumber(f.value * f1.value);
+}
+
+/*FloatNumber* operator*(const FloatNumber& f, const IntegerNumber& i)
+{
+  return new FloatNumber(f.value * i.value);
+}*/
+
+FloatNumber* operator*(const IntegerNumber& i, const FloatNumber& f)
+{
+  return new FloatNumber(i.value * f.value);
+}
+
+//###################### operator/ #########################################
+FloatNumber* operator/(const IntegerNumber& i, const IntegerNumber& i1)
+{
+  return new FloatNumber(i.value / i1.value);
+}
+
+FloatNumber* operator/(const FloatNumber& f, const FloatNumber& f1)
+{
+  return new FloatNumber(f.value / f1.value);
+}
+
+/*FloatNumber* operator/(const FloatNumber& f, const IntegerNumber& i)
+{
+  return new FloatNumber(f.value / i.value);
+}*/
+
+FloatNumber* operator/(const IntegerNumber& i, const FloatNumber& f)
+{
+  return new FloatNumber(i.value / f.value);
+}
 
 #endif // TYPES_HH
