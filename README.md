@@ -10,5 +10,6 @@ $ make run < input.txt # run the compiler with an input file
 
 # OR
 
-$ make clean; make configure; make; make < input.txt
+$ make clean; make configure; make # for building
+$ make run < input.txt # for running
 ```
