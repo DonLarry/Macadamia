@@ -10,9 +10,9 @@ static yy::location loc;
 %}
 
 %option noyywrap nounput batch debug noinput
-%option outfile="lexer.cpp"
 
 /*Keywords*/
+PRINT           "print"
 FALSE           "False"
 AWAIT           "await"
 ELSE            "else"
@@ -68,7 +68,7 @@ SLASH             [/]
 LPAR              [(]
 RPAR              [)]
 LSQB              "["
-RSQB              "]"		
+RSQB              "]"
 COLON             [:]
 SEMI              ";"
 COMMA             [,]
@@ -110,27 +110,28 @@ RARROW            "->"
 {NUMBER}          {return yy::parser::make_NUMBER(strtol(yytext, NULL, 10), loc);}
 {NPFLOAT}         {return yy::parser::make_NPFLOAT(std::stof(yytext), loc);}
 
-{FALSE}           {return yy::parser::make_FALSE(loc);}    
-{AWAIT}           {return yy::parser::make_AWAIT(loc);}    
-{ELSE}            {return yy::parser::make_ELSE(loc);}      
-{IMPORT}          {return yy::parser::make_IMPORT(loc);}   
+{PRINT}           {return yy::parser::make_PRINT(loc);}
+{FALSE}           {return yy::parser::make_FALSE(loc);}
+{AWAIT}           {return yy::parser::make_AWAIT(loc);}
+{ELSE}            {return yy::parser::make_ELSE(loc);}
+{IMPORT}          {return yy::parser::make_IMPORT(loc);}
 {PASS}            {return yy::parser::make_PASS(loc);}
-{NONE}            {return yy::parser::make_NONE(loc);}     
-{BREAK}           {return yy::parser::make_BREAK(loc);}     
-{EXCEPT}          {return yy::parser::make_EXCEPT(loc);}    
-{IN}              {return yy::parser::make_IN(loc);}    
+{NONE}            {return yy::parser::make_NONE(loc);}
+{BREAK}           {return yy::parser::make_BREAK(loc);}
+{EXCEPT}          {return yy::parser::make_EXCEPT(loc);}
+{IN}              {return yy::parser::make_IN(loc);}
 {RAISE}           {return yy::parser::make_RAISE(loc);}
-{TRUE}            {return yy::parser::make_TRUE(loc);}    
-{CLASS}           {return yy::parser::make_CLASS(loc);}    
-{FINALLY}         {return yy::parser::make_FINALLY(loc);}    
-{IS}              {return yy::parser::make_IS(loc);}      
+{TRUE}            {return yy::parser::make_TRUE(loc);}
+{CLASS}           {return yy::parser::make_CLASS(loc);}
+{FINALLY}         {return yy::parser::make_FINALLY(loc);}
+{IS}              {return yy::parser::make_IS(loc);}
 {RETURN}          {return yy::parser::make_RETURN(loc);}
-{AND}             {return yy::parser::make_AND(loc);}     
-{CONTINUE}        {return yy::parser::make_CONTINUE(loc);}  
-{FOR}             {return yy::parser::make_FOR(loc);}      
-{LAMBDA}          {return yy::parser::make_LAMBDA(loc);}   
+{AND}             {return yy::parser::make_AND(loc);}
+{CONTINUE}        {return yy::parser::make_CONTINUE(loc);}
+{FOR}             {return yy::parser::make_FOR(loc);}
+{LAMBDA}          {return yy::parser::make_LAMBDA(loc);}
 {TRY}             {return yy::parser::make_TRY(loc);}
-{AS}              {return yy::parser::make_AS(loc);}       
+{AS}              {return yy::parser::make_AS(loc);}
 {DEF}             {return yy::parser::make_DEF(loc);}
 {FROM}            {return yy::parser::make_FROM(loc);}
 {NONLOCAL}        {return yy::parser::make_NONLOCAL(loc);}
@@ -158,7 +159,7 @@ RARROW            "->"
 {LPAR}            {return yy::parser::make_LPAR(loc);}
 {RPAR}            {return yy::parser::make_RPAR(loc);}
 {LSQB}            {return yy::parser::make_LSQB(loc);}
-{RSQB}            {return yy::parser::make_RSQB(loc);}		
+{RSQB}            {return yy::parser::make_RSQB(loc);}
 {COLON}           {return yy::parser::make_COLON(loc);}
 {SEMI}            {return yy::parser::make_SEMI(loc);}
 {COMMA}           {return yy::parser::make_COMMA(loc);}
