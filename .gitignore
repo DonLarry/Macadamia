@@ -46,3 +46,9 @@ stack.hh
 
 # Text files
 *.txt
+
+# Binaries folder
+bin
+
+# Temp folder
+tmp
