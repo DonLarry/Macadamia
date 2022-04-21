@@ -6,10 +6,13 @@
 %define parse.assert
 %code requires
 {
-  #include "types.hh"
-  #include <string>
-  #include <stdio.h>
-  class driver;
+#include "types.hh"
+#include <iostream>
+#include <stdio.h>
+#include <fstream>
+#include <sstream>
+#include <string>
+struct driver;
 }
 %param { driver& drv }
 %locations
@@ -18,11 +21,11 @@
 %code
 {
 #include "driver.hh"
-#include <iostream>
 }
 %define api.token.prefix {TOK_}
 
 //Listado de Terminales
+%token  PRINT     "print"
 %token  FALSE     "False"
 %token  AWAIT     "await"
 %token  ELSE      "else"
@@ -114,68 +117,72 @@
 %left PLUS MINUS
 %left STAR SLASH PERCENT
 
-//Listado de No Terminales
-/* %type Expressions */
-%type <Expression*> Expression
+// Declaración de tipos de no terminales
 %type <Number*> Operation
 %type <Number*> Number
-/* %type Operator */
-/* %type Space */
 
 %printer { yyoutput << $$; } <*>;
 
 %%
-%start Expressions;
+%start Last;
+
+Last: First Expressions
+{
+  std::cout << "-- LAST EXECUTED --" << std::endl;
+  drv.out << "return 0;" << std::endl;
+  drv.out << "}" << std::endl;
+  std::ofstream out("tmp/" + drv.outputFile);
+  out << drv.out.str();
+  out.close();
+}
+
+First: %empty
+{
+  std::cout << "-- FIRST EXECUTED --" << std::endl;
+  drv.out << "#include<iostream>" << std::endl;
+  drv.out << "int main() {" << std::endl;
+}
 
 Expressions:
-  %empty
-|
-  Expressions PossibleExpression
-;
+  %empty { std::cout << "Expressions -> empty\n"; }
+  |
+  Expressions PossibleExpression { std::cout << "Expressions -> Expressions PossibleExpression\n"; }
+
 
 PossibleExpression:
-  Expression
-|
-  NEWLINE
-;
+  Expression { std::cout << "PossibleExpression -> Expression\n"; }
+  |
+  NEWLINE { std::cout << "PossibleExpression -> NEWLINE\n"; }
+
 
 Expression:
+  Number { std::cout << "Expression -> Number\n"; }
+  |
+  Print { std::cout << "Expression -> Print\n"; }
+
+
+Number:
+  NUMBER {$$ = new IntegerNumber($1); std::cout << "Number -> NUMBER\n"; }
+  |
+  NPFLOAT {$$ = new FloatNumber($1); std::cout << "Number -> NPFLOAT\n"; }
+  |
   Operation
-  {
-    std::cout << "Expression -> Operation (";
-    $1->printValue();
-    std::cout << ")\n";
-  }
-;
+
 
 Operation:
-  Number
-|
-  Operation PLUS Number {$$ = $1 + $3;}
-|
-  Operation MINUS Number {$$ = $1 - $3;}
-|
-  Operation STAR Number {$$ = $1 * $3;}
-|
-  Operation SLASH Number {$$ = $1 / $3;}
-;
+  Number PLUS Number {$$ = add(*$1, *$3); std::cout << "Operation -> Number PLUS Number\n"; }
+  |
+  Number MINUS Number {$$ = sub(*$1, *$3); std::cout << "Operation -> Number MINUS Number\n"; }
+  |
+  Number STAR Number {$$ = mul(*$1, *$3); std::cout << "Operation -> Number STAR Number\n"; }
+  |
+  Number SLASH Number {$$ = div(*$1, *$3); std::cout << "Operation -> Number SLASH Number\n"; }
 
-Number :
-  NUMBER
-  {
-    $$ = new IntegerNumber($1);
-    std::cout << "Number -> NUMBER (" << $1 << ")\n";
-  }
-|
-NPFLOAT
-  {
-    $$ = new FloatNumber($1);
-    std::cout << "Number -> NPFLOAT (" << $1 << ")\n";
-  }
-;
+Print:
+  PRINT LPAR Number RPAR {drv.out << "std::cout<<" << *$3 << "<<std::endl;" << std::endl; std::cout << "Print -> PRINT LPAR Number RPAR\n"; }
 %%
 
 void yy::parser::error(const location_type& location, const std::string& error)
 {
-  std::cout << error << std::endl;
+  std::cerr << error << std::endl;
 }
