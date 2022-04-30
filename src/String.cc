@@ -26,5 +26,6 @@ void String::print(std::ostream& os)
 
 std::ostream& operator<<(std::ostream& os, String& str)
 {
-  return os << *((String*)&str);
+  str.print(os);
+  return os;
 }

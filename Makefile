@@ -30,6 +30,10 @@ lexer.cc:
 parser.tab.cc:
 	bison -b $(TMP)/parser parser.yy
 
+out: $(TMP)/out.cpp
+	$(CC) $(CFLAGS) -o $@.exe $<
+	./$@.exe
+
 debug:
 	@echo "    CC: $(CC)"
 	@echo "  SRCS: $(SRCS)"
@@ -39,6 +43,7 @@ debug:
 clean:
 	rm -f $(BIN)/*
 	rm -f $(TMP)/*
+	rm -f *.exe
 
 run:
 	./$(BIN)/$(TARGET)
