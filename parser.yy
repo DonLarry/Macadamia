@@ -120,6 +120,8 @@ struct driver;
 // Declaración de tipos de no terminales
 %type <Number*> Operation
 %type <Number*> Number
+%type <String*> String
+%type <String*> StringOperation
 
 %printer { yyoutput << $$; } <*>;
 
@@ -159,7 +161,8 @@ Expression:
   Number { std::cout << "Expression -> Number\n"; }
   |
   Print { std::cout << "Expression -> Print\n"; }
-
+  |
+  String {std::cout << "Expression -> String\n"; }
 
 Number:
   NUMBER {$$ = new IntegerNumber($1); std::cout << "Number -> NUMBER\n"; }
@@ -167,6 +170,11 @@ Number:
   NPFLOAT {$$ = new FloatNumber($1); std::cout << "Number -> NPFLOAT\n"; }
   |
   Operation
+
+String:
+  STRING {$$ = new String($1); std::cout << "String -> STRING\n";}
+  |
+  StringOperation
 
 
 Operation:
@@ -178,8 +186,13 @@ Operation:
   |
   Number SLASH Number {$$ = div(*$1, *$3); std::cout << "Operation -> Number SLASH Number\n"; }
 
+StringOperation:
+  String PLUS String {$$ = add(*$1, *$3); std::cout << "StringOperation -> String PLUS String\n";}
+
 Print:
   PRINT LPAR Number RPAR {drv.out << "std::cout<<" << *$3 << "<<std::endl;" << std::endl; std::cout << "Print -> PRINT LPAR Number RPAR\n"; }
+  |
+  PRINT LPAR String RPAR {drv.out << "std::cout<<" << *$3 << "<<std::endl;" << std::endl; std::cout << "Print -> PRINT LPAR String RPAR\n"; }
 %%
 
 void yy::parser::error(const location_type& location, const std::string& error)
