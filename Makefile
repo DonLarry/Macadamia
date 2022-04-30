@@ -1,4 +1,4 @@
-TARGET = test
+TARGET = test.exe
 
 SRC = src
 INC = inc

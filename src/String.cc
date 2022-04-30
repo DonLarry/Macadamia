@@ -6,7 +6,7 @@ String::String() : Expression(STRINGG)
   // empty
 }
 
-String::String(std::string value) : Expression(STRINGG), value(value)
+String::String(std::string value) : Expression(STRINGG), value(value.substr(1, value.size() - 2))
 {
   // empty
 }

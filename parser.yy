@@ -118,8 +118,8 @@ struct driver;
 %left STAR SLASH PERCENT
 
 // Declaración de tipos de no terminales
-%type <Number*> Operation
 %type <Number*> Number
+%type <Number*> NumberOperation
 %type <String*> String
 %type <String*> StringOperation
 
@@ -150,12 +150,10 @@ Expressions:
   |
   Expressions PossibleExpression { std::cout << "Expressions -> Expressions PossibleExpression\n"; }
 
-
 PossibleExpression:
   Expression { std::cout << "PossibleExpression -> Expression\n"; }
   |
   NEWLINE { std::cout << "PossibleExpression -> NEWLINE\n"; }
-
 
 Expression:
   Number { std::cout << "Expression -> Number\n"; }
@@ -169,15 +167,9 @@ Number:
   |
   NPFLOAT {$$ = new FloatNumber($1); std::cout << "Number -> NPFLOAT\n"; }
   |
-  Operation
+  NumberOperation
 
-String:
-  STRING {$$ = new String($1); std::cout << "String -> STRING\n";}
-  |
-  StringOperation
-
-
-Operation:
+NumberOperation:
   Number PLUS Number {$$ = add(*$1, *$3); std::cout << "Operation -> Number PLUS Number\n"; }
   |
   Number MINUS Number {$$ = sub(*$1, *$3); std::cout << "Operation -> Number MINUS Number\n"; }
@@ -186,13 +178,18 @@ Operation:
   |
   Number SLASH Number {$$ = div(*$1, *$3); std::cout << "Operation -> Number SLASH Number\n"; }
 
+String:
+  STRING {$$ = new String($1); std::cout << "String -> STRING\n";}
+  |
+  StringOperation
+
 StringOperation:
   String PLUS String {$$ = add(*$1, *$3); std::cout << "StringOperation -> String PLUS String\n";}
 
 Print:
   PRINT LPAR Number RPAR {drv.out << "std::cout<<" << *$3 << "<<std::endl;" << std::endl; std::cout << "Print -> PRINT LPAR Number RPAR\n"; }
   |
-  PRINT LPAR String RPAR {drv.out << "std::cout<<" << *$3 << "<<std::endl;" << std::endl; std::cout << "Print -> PRINT LPAR String RPAR\n"; }
+  PRINT LPAR String RPAR {drv.out << "std::cout<<\"" << *$3 << "\"<<std::endl;" << std::endl; std::cout << "Print -> PRINT LPAR String RPAR\n"; }
 %%
 
 void yy::parser::error(const location_type& location, const std::string& error)
