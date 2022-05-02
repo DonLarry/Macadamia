@@ -25,10 +25,10 @@ $(BIN)/%.o: $(SRC)/%.cc
 configure: lexer.cc parser.tab.cc
 
 lexer.cc:
-	flex -o $(TMP)/lexer.cc lexer.l
+	flex -o $(TMP)/lexer.cc $(SRC)/lexer.l
 
 parser.tab.cc:
-	bison -b $(TMP)/parser parser.yy
+	bison -b $(TMP)/parser $(SRC)/parser.yy
 
 out: $(TMP)/out.cpp
 	$(CC) $(CFLAGS) -o $@.exe $<
