@@ -26,6 +26,7 @@ struct driver;
 
 //Listado de Terminales
 %token  PRINT     "print"
+%token  INPUT     "input"
 %token  FALSE     "False"
 %token  AWAIT     "await"
 %token  ELSE      "else"
@@ -118,10 +119,13 @@ struct driver;
 %left STAR SLASH PERCENT
 
 // Declaración de tipos de no terminales
-%type <Number*> Number
-%type <Number*> NumberOperation
-%type <String*> String
-%type <String*> StringOperation
+%type <std::string> Number
+%type <Number*> LiteralNumber
+%type <Number*> LiteralNumberOperation
+%type <std::string> String
+%type <String*> LiteralString
+%type <String*> LiteralStringOperation
+%type <String*> Input
 
 %printer { yyoutput << $$; } <*>;
 
@@ -143,53 +147,110 @@ First: %empty
   std::cout << "-- FIRST EXECUTED --" << std::endl;
   drv.out << "#include<iostream>" << std::endl;
   drv.out << "int main() {" << std::endl;
+  drv.out << "std::string str;" << std::endl;
+  drv.out << "int integer;" << std::endl;
+  drv.out << "float floating;" << std::endl;
 }
 
 Expressions:
-  %empty { std::cout << "Expressions -> empty\n"; }
+  %empty {}
   |
-  Expressions PossibleExpression { std::cout << "Expressions -> Expressions PossibleExpression\n"; }
+  Expressions PossibleExpression {}
 
 PossibleExpression:
-  Expression { std::cout << "PossibleExpression -> Expression\n"; }
+  Expression {}
   |
-  NEWLINE { std::cout << "PossibleExpression -> NEWLINE\n"; }
+  NEWLINE {}
 
 Expression:
-  Number { std::cout << "Expression -> Number\n"; }
+  Number {}
   |
-  Print { std::cout << "Expression -> Print\n"; }
+  Print {}
   |
-  String {std::cout << "Expression -> String\n"; }
+  String {}
+
+// Numbers
 
 Number:
-  NUMBER {$$ = new IntegerNumber($1); std::cout << "Number -> NUMBER\n"; }
-  |
-  NPFLOAT {$$ = new FloatNumber($1); std::cout << "Number -> NPFLOAT\n"; }
-  |
-  NumberOperation
+  LiteralNumber
+  {
+    $$ = $1->codegen();
+  }
+//  |
+//  VarInteger
+//  {
+//    $$ = "str";
+//  }
 
-NumberOperation:
-  Number PLUS Number {$$ = add(*$1, *$3); std::cout << "Operation -> Number PLUS Number\n"; }
+LiteralNumber:
+  NUMBER {$$ = new IntegerNumber($1);}
   |
-  Number MINUS Number {$$ = sub(*$1, *$3); std::cout << "Operation -> Number MINUS Number\n"; }
+  NPFLOAT {$$ = new FloatNumber($1);}
   |
-  Number STAR Number {$$ = mul(*$1, *$3); std::cout << "Operation -> Number STAR Number\n"; }
+  LiteralNumberOperation
+
+LiteralNumberOperation:
+  LiteralNumber PLUS LiteralNumber {$$ = add(*$1, *$3);}
   |
-  Number SLASH Number {$$ = div(*$1, *$3); std::cout << "Operation -> Number SLASH Number\n"; }
+  LiteralNumber MINUS LiteralNumber {$$ = sub(*$1, *$3);}
+  |
+  LiteralNumber STAR LiteralNumber {$$ = mul(*$1, *$3);}
+  |
+  LiteralNumber SLASH LiteralNumber {$$ = div(*$1, *$3);}
+
+//VarInteger:
+//  // Some productions
+
+// Strings
 
 String:
-  STRING {$$ = new String($1); std::cout << "String -> STRING\n";}
+  LiteralString
+  {
+    $$ = $1->codegen();
+  }
   |
-  StringOperation
+  VarStr
+  {
+    $$ = "str";
+  }
 
-StringOperation:
-  String PLUS String {$$ = add(*$1, *$3); std::cout << "StringOperation -> String PLUS String\n";}
+LiteralString:
+  STRING {$$ = new String($1);}
+  |
+  LiteralStringOperation
+
+LiteralStringOperation:
+  LiteralString PLUS LiteralString {$$ = add(*$1, *$3);}
+
+VarStr:
+  Input
+
+// Built-in functions
 
 Print:
-  PRINT LPAR Number RPAR {drv.out << "std::cout<<" << *$3 << "<<std::endl;" << std::endl; std::cout << "Print -> PRINT LPAR Number RPAR\n"; }
+  PRINT LPAR Number RPAR
+  {
+    drv.out << "std::cout<<" << $3 << "<<std::endl;" << std::endl;
+  }
   |
-  PRINT LPAR String RPAR {drv.out << "std::cout<<\"" << *$3 << "\"<<std::endl;" << std::endl; std::cout << "Print -> PRINT LPAR String RPAR\n"; }
+  PRINT LPAR String RPAR
+  {
+    drv.out << "std::cout<<" << $3 << "<<std::endl;" << std::endl;
+  }
+
+InputPrompt:
+  %empty {}
+  |
+  String
+  {
+    drv.out << "std::cout << " << $1 << ";" << std::endl;
+  }
+
+Input:
+  INPUT LPAR InputPrompt RPAR
+  {
+    drv.out << "getline(std::cin, str);" << std::endl;
+  }
 %%
 
 void yy::parser::error(const location_type& location, const std::string& error)

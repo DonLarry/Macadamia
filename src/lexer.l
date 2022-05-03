@@ -13,6 +13,7 @@ static yy::location loc;
 
 /*Keywords*/
 PRINT           "print"
+INPUT           "input"
 FALSE           "False"
 AWAIT           "await"
 ELSE            "else"
@@ -111,6 +112,7 @@ RARROW            "->"
 {NPFLOAT}         {return yy::parser::make_NPFLOAT(std::stof(yytext), loc);}
 
 {PRINT}           {return yy::parser::make_PRINT(loc);}
+{INPUT}           {return yy::parser::make_INPUT(loc);}
 {FALSE}           {return yy::parser::make_FALSE(loc);}
 {AWAIT}           {return yy::parser::make_AWAIT(loc);}
 {ELSE}            {return yy::parser::make_ELSE(loc);}
