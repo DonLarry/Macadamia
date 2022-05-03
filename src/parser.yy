@@ -134,7 +134,6 @@ struct driver;
 
 Last: First Expressions
 {
-  std::cout << "-- LAST EXECUTED --" << std::endl;
   drv.out << "return 0;" << std::endl;
   drv.out << "}" << std::endl;
   std::ofstream out("tmp/" + drv.outputFile);
@@ -144,7 +143,6 @@ Last: First Expressions
 
 First: %empty
 {
-  std::cout << "-- FIRST EXECUTED --" << std::endl;
   drv.out << "#include<iostream>" << std::endl;
   drv.out << "int main() {" << std::endl;
   drv.out << "std::string str;" << std::endl;
