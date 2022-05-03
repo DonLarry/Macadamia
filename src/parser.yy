@@ -27,6 +27,10 @@ struct driver;
 //Listado de Terminales
 %token  PRINT     "print"
 %token  INPUT     "input"
+%token  BOOL_CAST "bool"
+%token  INT_CAST  "int"
+%token  FLOAT_CAST "float"
+%token  STRING_CAST "str"
 %token  FALSE     "False"
 %token  AWAIT     "await"
 %token  ELSE      "else"
@@ -118,14 +122,22 @@ struct driver;
 %left PLUS MINUS
 %left STAR SLASH PERCENT
 
-// Declaración de tipos de no terminales
+// Non-terminal definitions
+
 %type <std::string> Number
 %type <Number*> LiteralNumber
 %type <Number*> LiteralNumberOperation
+
 %type <std::string> String
 %type <String*> LiteralString
 %type <String*> LiteralStringOperation
+
+// Built-in functions
+
 %type <String*> Input
+%type <std::string> Int
+%type <std::string> Float
+%type <std::string> Str
 
 %printer { yyoutput << $$; } <*>;
 
@@ -174,6 +186,16 @@ Number:
   {
     $$ = $1->codegen();
   }
+  |
+  Int
+  {
+    $$ = $1;
+  }
+  |
+  Float
+  {
+    $$ = $1;
+  }
 //  |
 //  VarInteger
 //  {
@@ -210,6 +232,11 @@ String:
   VarStr
   {
     $$ = "str";
+  }
+  |
+  Str
+  {
+    $$ = $1;
   }
 
 LiteralString:
@@ -249,6 +276,40 @@ Input:
   {
     drv.out << "getline(std::cin, str);" << std::endl;
   }
+
+Int:
+  INT_CAST LPAR LiteralNumber RPAR
+  {
+    $$ = "(int)" + $3->codegen();
+  }
+  |
+  INT_CAST LPAR LiteralString RPAR
+  {
+    $$ = "atol(" + $3->codegen() + ")";
+  }
+
+Float:
+  FLOAT_CAST LPAR LiteralNumber RPAR
+  {
+    $$ = "(float)" + $3->codegen();
+  }
+  |
+  FLOAT_CAST LPAR LiteralString RPAR
+  {
+    $$ = "atof(" + $3->codegen() + ")";
+  }
+
+Str:
+  STRING_CAST LPAR LiteralNumber RPAR
+  {
+    $$ = "std::to_string(" + $3->codegen() + ")";
+  }
+  |
+  STRING_CAST LPAR LiteralString RPAR
+  {
+    $$ = $3->codegen();
+  }
+
 %%
 
 void yy::parser::error(const location_type& location, const std::string& error)
