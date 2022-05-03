@@ -5,8 +5,8 @@ String::String() : Expression(STRING)
 {
   // empty
 }
-
-String::String(std::string value) : Expression(STRING), value(value.substr(1, value.size() - 2))
+#include<iostream>
+String::String(std::string value) : Expression(STRING), value(value)
 {
   // empty
 }

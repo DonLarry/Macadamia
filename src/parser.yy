@@ -213,7 +213,7 @@ String:
   }
 
 LiteralString:
-  STRING {$$ = new String($1);}
+  STRING {$$ = new String($1.substr(1, $1.size() - 2));}
   |
   LiteralStringOperation
 
