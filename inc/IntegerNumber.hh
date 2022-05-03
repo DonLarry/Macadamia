@@ -9,6 +9,7 @@ struct IntegerNumber : Number
 {
   int value;
   void print(std::ostream& os);
+  std::string codegen();
   IntegerNumber();
   IntegerNumber(int value);
 };

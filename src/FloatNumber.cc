@@ -16,6 +16,11 @@ void FloatNumber::print(std::ostream& os)
   os << value;
 }
 
+std::string FloatNumber::codegen()
+{
+  return std::to_string(value);
+}
+
 std::ostream& operator<<(std::ostream& os, FloatNumber& num)
 {
   num.print(os);

@@ -9,6 +9,7 @@ struct FloatNumber : Number
 {
   float value;
   void print(std::ostream& os);
+  std::string codegen();
   FloatNumber();
   FloatNumber(float value);
 };

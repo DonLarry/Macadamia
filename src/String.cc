@@ -1,12 +1,12 @@
 #include "String.hh"
 
 
-String::String() : Expression(STRINGG)
+String::String() : Expression(STRING)
 {
   // empty
 }
 
-String::String(std::string value) : Expression(STRINGG), value(value.substr(1, value.size() - 2))
+String::String(std::string value) : Expression(STRING), value(value.substr(1, value.size() - 2))
 {
   // empty
 }
@@ -22,6 +22,11 @@ String* add(String &a, String &b)
 void String::print(std::ostream& os)
 {
   os << value;
+}
+
+std::string String::codegen()
+{
+  return "\"" + value + "\"";
 }
 
 std::ostream& operator<<(std::ostream& os, String& str)

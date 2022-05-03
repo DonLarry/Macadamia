@@ -16,6 +16,11 @@ void IntegerNumber::print(std::ostream& os)
   os << value;
 }
 
+std::string IntegerNumber::codegen()
+{
+  return std::to_string(value);
+}
+
 std::ostream& operator<<(std::ostream& os, IntegerNumber& num)
 {
   num.print(os);

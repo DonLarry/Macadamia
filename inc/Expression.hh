@@ -9,7 +9,7 @@ struct Expression
     EXPRESSION,
     FLOAT_NUMBER,
     INTEGER_NUMBER,
-    STRINGG,
+    STRING,
     IF_SEQUENCE,
     FOR_SEQUENCE
   };

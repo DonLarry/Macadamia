@@ -9,6 +9,7 @@
 struct Number : Expression
 {
   virtual void print(std::ostream& os) = 0;
+  virtual std::string codegen() = 0;
 
   Number();
   Number(Type type);

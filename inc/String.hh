@@ -10,9 +10,12 @@
 struct String : Expression
 {
   std::string value;
+  
+  void print(std::ostream& os);
+  std::string codegen();
+
   String();
   String(std::string value);
-  void print(std::ostream& os);
 };
 
 String* add(String &a, String &b);
