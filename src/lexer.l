@@ -14,10 +14,10 @@ static yy::location loc;
 /*Keywords*/
 PRINT           "print"
 INPUT           "input"
-BOOL_CAST       "bool"
-INT_CAST        "int"
-FLOAT_CAST      "float"
-STRING_CAST     "str"
+BOOL_TYPE       "bool"
+INT_TYPE        "int"
+FLOAT_TYPE      "float"
+STRING_TYPE     "str"
 FALSE           "False"
 AWAIT           "await"
 ELSE            "else"
@@ -117,10 +117,10 @@ RARROW            "->"
 
 {PRINT}           {return yy::parser::make_PRINT(loc);}
 {INPUT}           {return yy::parser::make_INPUT(loc);}
-{BOOL_CAST}       {return yy::parser::make_BOOL_CAST(loc);}
-{INT_CAST}        {return yy::parser::make_INT_CAST(loc);}
-{FLOAT_CAST}      {return yy::parser::make_FLOAT_CAST(loc);}
-{STRING_CAST}     {return yy::parser::make_STRING_CAST(loc);}
+{BOOL_TYPE}       {return yy::parser::make_BOOL_TYPE(loc);}
+{INT_TYPE}        {return yy::parser::make_INT_TYPE(loc);}
+{FLOAT_TYPE}      {return yy::parser::make_FLOAT_TYPE(loc);}
+{STRING_TYPE}     {return yy::parser::make_STRING_TYPE(loc);}
 {FALSE}           {return yy::parser::make_FALSE(loc);}
 {AWAIT}           {return yy::parser::make_AWAIT(loc);}
 {ELSE}            {return yy::parser::make_ELSE(loc);}

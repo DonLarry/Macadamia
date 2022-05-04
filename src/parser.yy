@@ -27,10 +27,10 @@ struct driver;
 //Listado de Terminales
 %token  PRINT     "print"
 %token  INPUT     "input"
-%token  BOOL_CAST "bool"
-%token  INT_CAST  "int"
-%token  FLOAT_CAST "float"
-%token  STRING_CAST "str"
+%token  BOOL_TYPE "bool"
+%token  INT_TYPE  "int"
+%token  FLOAT_TYPE "float"
+%token  STRING_TYPE "str"
 %token  FALSE     "False"
 %token  AWAIT     "await"
 %token  ELSE      "else"
@@ -184,6 +184,8 @@ Expression:
   String {}
   |
   Boolean {}
+  |
+  VarDeclaration {}
 
 
 // Numbers
@@ -310,12 +312,12 @@ Input:
   }
 
 Bool:
-  BOOL_CAST LPAR LiteralBoolean RPAR
+  BOOL_TYPE LPAR LiteralBoolean RPAR
   {
     $$ = ($3 ? "true" : "false");
   }
   |
-  BOOL_CAST LPAR LiteralNumber RPAR
+  BOOL_TYPE LPAR LiteralNumber RPAR
   {
     bool t;
     if ($3->type == 1) // FLOAT_NUMBER
@@ -325,77 +327,204 @@ Bool:
     $$ = t ? "true" : "false";
   }
   |
-  BOOL_CAST LPAR LiteralString RPAR
+  BOOL_TYPE LPAR LiteralString RPAR
   {
     $$ = $3->value.empty() ? "false" : "true";
   }
   |
-  BOOL_CAST LPAR Bool RPAR
+  BOOL_TYPE LPAR Bool RPAR
   {
     $$ = $3;
   }
   |
-  BOOL_CAST LPAR Int RPAR
+  BOOL_TYPE LPAR Int RPAR
   {
     $$ = atol($3.c_str()) ? "true" : "false";
   }
   |
-  BOOL_CAST LPAR Float RPAR
+  BOOL_TYPE LPAR Float RPAR
   {
     $$ = atof($3.c_str()) ? "true" : "false";
   }
   |
-  BOOL_CAST LPAR Str RPAR
+  BOOL_TYPE LPAR Str RPAR
   {
     $$ = $3.empty() ? "false" : "true";
   }
 
 Int:
-  INT_CAST LPAR LiteralBoolean RPAR
+  INT_TYPE LPAR LiteralBoolean RPAR
   {
     $$ = $3 ? "1" : "0";
   }
   |
-  INT_CAST LPAR LiteralNumber RPAR
+  INT_TYPE LPAR LiteralNumber RPAR
   {
     $$ = std::to_string(atol($3->codegen().c_str()));
   }
   |
-  INT_CAST LPAR LiteralString RPAR
+  INT_TYPE LPAR LiteralString RPAR
   {
     $$ = std::to_string(atol($3->value.c_str()));
   }
+  |
+  INT_TYPE LPAR Bool RPAR
+  {
+    $$ = $3=="true" ? "1" : "0";
+  }
+  |
+  INT_TYPE LPAR Int RPAR
+  {
+    $$ = $3;
+  }
+  |
+  INT_TYPE LPAR Float RPAR
+  {
+    $$ = std::to_string((int)atof($3.c_str()));
+  }
+  |
+  INT_TYPE LPAR Str RPAR
+  {
+    $$ = std::to_string(atol($3.c_str()));
+  }
 
 Float:
-  FLOAT_CAST LPAR LiteralBoolean RPAR
+  FLOAT_TYPE LPAR LiteralBoolean RPAR
   {
     $$ = $3 ? "1.0" : "0.0";
   }
   |
-  FLOAT_CAST LPAR LiteralNumber RPAR
+  FLOAT_TYPE LPAR LiteralNumber RPAR
   {
     $$ = std::to_string(atof($3->codegen().c_str()));
   }
   |
-  FLOAT_CAST LPAR LiteralString RPAR
+  FLOAT_TYPE LPAR LiteralString RPAR
   {
     $$ = std::to_string(atof($3->value.c_str()));
   }
+  |
+  FLOAT_TYPE LPAR Bool RPAR
+  {
+    $$ = $3=="true" ? "1.0" : "0.0";
+  }
+  |
+  FLOAT_TYPE LPAR Int RPAR
+  {
+    $$ = std::to_string(atof($3.c_str()));
+  }
+  |
+  FLOAT_TYPE LPAR Float RPAR
+  {
+    $$ = $3;
+  }
+  |
+  FLOAT_TYPE LPAR Str RPAR
+  {
+    $$ = std::to_string(atof($3.c_str()));
+  }
 
 Str:
-  STRING_CAST LPAR LiteralBoolean RPAR
+  STRING_TYPE LPAR LiteralBoolean RPAR
   {
     $$ = $3 ? "\"True\"" : "\"False\"";
   }
   |
-  STRING_CAST LPAR LiteralNumber RPAR
+  STRING_TYPE LPAR LiteralNumber RPAR
   {
     $$ = "\"" + $3->codegen() + "\"";
   }
   |
-  STRING_CAST LPAR LiteralString RPAR
+  STRING_TYPE LPAR LiteralString RPAR
   {
     $$ = $3->codegen();
+  }
+  |
+  STRING_TYPE LPAR Bool RPAR
+  {
+    $$ = "\"" + $3 + "\"";
+  }
+  |
+  STRING_TYPE LPAR Int RPAR
+  {
+    $$ = "\"" + $3 + "\"";
+  }
+  |
+  STRING_TYPE LPAR Float RPAR
+  {
+    $$ = "\"" + $3 + "\"";
+  }
+  |
+  STRING_TYPE LPAR Str RPAR
+  {
+    $$ = $3;
+  }
+
+VarDeclaration:
+  IDENTIFIER COLON BOOL_TYPE EQUAL Boolean
+  {
+    auto r = drv.identifiers.emplace($1, driver::Type::BOOL);
+    if (!r.second)
+    {
+      std::cerr << "Error: Variable " << $1 << " already exists." << std::endl;
+      exit(1);
+    }
+    drv.out << "bool " << $1 << " = " << $5 << ";\n";
+  }
+  |
+  IDENTIFIER COLON INT_TYPE EQUAL LiteralNumber
+  {
+    auto r = drv.identifiers.emplace($1, driver::Type::INT);
+    if (!r.second)
+    {
+      std::cerr << "Error: Variable " << $1 << " already exists." << std::endl;
+      exit(1);
+    }
+    drv.out << "int " << $1 << " = " << *$5 << ";\n";
+  }
+  |
+  IDENTIFIER COLON INT_TYPE EQUAL Int
+  {
+    auto r = drv.identifiers.emplace($1, driver::Type::INT);
+    if (!r.second)
+    {
+      std::cerr << "Error: Variable " << $1 << " already exists." << std::endl;
+      exit(1);
+    }
+    drv.out << "int " << $1 << " = " << $5 << ";\n";
+  }
+  |
+  IDENTIFIER COLON FLOAT_TYPE EQUAL LiteralNumber
+  {
+    auto r = drv.identifiers.emplace($1, driver::Type::FLOAT);
+    if (!r.second)
+    {
+      std::cerr << "Error: Variable " << $1 << " already exists." << std::endl;
+      exit(1);
+    }
+    drv.out << "float " << $1 << " = " << *$5 << ";\n";
+  }
+  |
+  IDENTIFIER COLON FLOAT_TYPE EQUAL Float
+  {
+    auto r = drv.identifiers.emplace($1, driver::Type::FLOAT);
+    if (!r.second)
+    {
+      std::cerr << "Error: Variable " << $1 << " already exists." << std::endl;
+      exit(1);
+    }
+    drv.out << "float " << $1 << " = " << $5 << ";\n";
+  }
+  |
+  IDENTIFIER COLON STRING_TYPE EQUAL String
+  {
+    auto r = drv.identifiers.emplace($1, driver::Type::STRING);
+    if (!r.second)
+    {
+      std::cerr << "Error: Variable " << $1 << " already exists." << std::endl;
+      exit(1);
+    }
+    drv.out << "std::string " << $1 << " = " << $5 << ";\n";
   }
 
 %%

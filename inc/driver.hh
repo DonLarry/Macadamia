@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <string>
+#include <map>
+#include <set>
 #include "parser.tab.hh"
 
 #define YY_DECL \
@@ -11,7 +13,14 @@ YY_DECL;
 
 struct driver
 {
-  // std::map<std::string, int> variables;
+  enum class Type
+  {
+    BOOL,
+    INT,
+    FLOAT,
+    STRING
+  };
+  std::map<std::string, Type> identifiers;
   int result;
   std::string file;
   std::stringstream& out;
