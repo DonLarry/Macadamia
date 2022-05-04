@@ -282,6 +282,11 @@ LiteralBoolean:
 // Built-in functions
 
 Print:
+  PRINT LPAR RPAR
+  {
+    drv.out << "std::cout << \"\\n\";" << std::endl;
+  }
+  |
   PRINT LPAR Number RPAR
   {
     drv.out << "std::cout<<" << $3 << "<<std::endl;" << std::endl;
@@ -293,6 +298,11 @@ Print:
   }
   |
   PRINT LPAR Boolean RPAR
+  {
+    drv.out << "std::cout<<" << $3 << "<<std::endl;" << std::endl;
+  }
+  |
+  PRINT LPAR IDENTIFIER RPAR
   {
     drv.out << "std::cout<<" << $3 << "<<std::endl;" << std::endl;
   }
