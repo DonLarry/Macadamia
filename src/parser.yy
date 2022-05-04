@@ -132,9 +132,13 @@ struct driver;
 %type <String*> LiteralString
 %type <String*> LiteralStringOperation
 
+%type <std::string> Boolean
+%type <bool> LiteralBoolean
+
 // Built-in functions
 
 %type <String*> Input
+%type <std::string> Bool
 %type <std::string> Int
 %type <std::string> Float
 %type <std::string> Str
@@ -178,6 +182,9 @@ Expression:
   Print {}
   |
   String {}
+  |
+  Boolean {}
+
 
 // Numbers
 
@@ -250,6 +257,26 @@ LiteralStringOperation:
 VarStr:
   Input
 
+
+// Booleans
+
+Boolean:
+  LiteralBoolean
+  {
+    $$ = ($1 ? "true" : "false");
+  }
+  |
+  Bool
+  {
+    $$ = $1;
+  }
+
+LiteralBoolean:
+  TRUE {$$ = true;}
+  |
+  FALSE {$$ = false;}
+
+
 // Built-in functions
 
 Print:
@@ -259,6 +286,11 @@ Print:
   }
   |
   PRINT LPAR String RPAR
+  {
+    drv.out << "std::cout<<" << $3 << "<<std::endl;" << std::endl;
+  }
+  |
+  PRINT LPAR Boolean RPAR
   {
     drv.out << "std::cout<<" << $3 << "<<std::endl;" << std::endl;
   }
@@ -277,32 +309,88 @@ Input:
     drv.out << "getline(std::cin, str);" << std::endl;
   }
 
+Bool:
+  BOOL_CAST LPAR LiteralBoolean RPAR
+  {
+    $$ = ($3 ? "true" : "false");
+  }
+  |
+  BOOL_CAST LPAR LiteralNumber RPAR
+  {
+    bool t;
+    if ($3->type == 1) // FLOAT_NUMBER
+      t = atof($3->codegen().c_str());
+    else
+      t = atol($3->codegen().c_str());
+    $$ = t ? "true" : "false";
+  }
+  |
+  BOOL_CAST LPAR LiteralString RPAR
+  {
+    $$ = $3->value.empty() ? "false" : "true";
+  }
+  |
+  BOOL_CAST LPAR Bool RPAR
+  {
+    $$ = $3;
+  }
+  |
+  BOOL_CAST LPAR Int RPAR
+  {
+    $$ = atol($3.c_str()) ? "true" : "false";
+  }
+  |
+  BOOL_CAST LPAR Float RPAR
+  {
+    $$ = atof($3.c_str()) ? "true" : "false";
+  }
+  |
+  BOOL_CAST LPAR Str RPAR
+  {
+    $$ = $3.empty() ? "false" : "true";
+  }
+
 Int:
+  INT_CAST LPAR LiteralBoolean RPAR
+  {
+    $$ = $3 ? "1" : "0";
+  }
+  |
   INT_CAST LPAR LiteralNumber RPAR
   {
-    $$ = "(int)" + $3->codegen();
+    $$ = std::to_string(atol($3->codegen().c_str()));
   }
   |
   INT_CAST LPAR LiteralString RPAR
   {
-    $$ = "atol(" + $3->codegen() + ")";
+    $$ = std::to_string(atol($3->value.c_str()));
   }
 
 Float:
+  FLOAT_CAST LPAR LiteralBoolean RPAR
+  {
+    $$ = $3 ? "1.0" : "0.0";
+  }
+  |
   FLOAT_CAST LPAR LiteralNumber RPAR
   {
-    $$ = "(float)" + $3->codegen();
+    $$ = std::to_string(atof($3->codegen().c_str()));
   }
   |
   FLOAT_CAST LPAR LiteralString RPAR
   {
-    $$ = "atof(" + $3->codegen() + ")";
+    $$ = std::to_string(atof($3->value.c_str()));
   }
 
 Str:
+  STRING_CAST LPAR LiteralBoolean RPAR
+  {
+    $$ = $3 ? "\"True\"" : "\"False\"";
+  }
+  |
   STRING_CAST LPAR LiteralNumber RPAR
   {
-    $$ = "std::to_string(" + $3->codegen() + ")";
+    $$ = "\"" + $3->codegen() + "\"";
   }
   |
   STRING_CAST LPAR LiteralString RPAR
