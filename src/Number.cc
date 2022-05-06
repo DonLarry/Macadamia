@@ -47,6 +47,13 @@ Number* div(Number &a, Number &b)
   return new FloatNumber(valueA / valueB);
 }
 
+Number* div_floor(Number &a, Number &b)
+{
+  auto valueA = (a.type == Expression::FLOAT_NUMBER) ? ((FloatNumber*)&a)->value : ((IntegerNumber*)&a)->value;
+  auto valueB = (b.type == Expression::FLOAT_NUMBER) ? ((FloatNumber*)&b)->value : ((IntegerNumber*)&b)->value;
+  return new IntegerNumber(valueA / valueB);
+}
+
 std::ostream& operator<<(std::ostream& os, Number& num)
 {
   if (num.type == Expression::FLOAT_NUMBER)

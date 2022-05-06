@@ -17,6 +17,7 @@ struct Expression
 
   Expression();
   Expression(Type type);
+  virtual ~Expression() = default;
 };
 
 

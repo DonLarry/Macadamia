@@ -13,12 +13,14 @@ struct Number : Expression
 
   Number();
   Number(Type type);
+  virtual ~Number() = default;
 };
 
 Number* add(Number &a, Number &b);
 Number* sub(Number &a, Number &b);
 Number* mul(Number &a, Number &b);
 Number* div(Number &a, Number &b);
+Number* div_floor(Number &a, Number &b);
 
 std::ostream& operator<<(std::ostream& os, Number& num);
 
