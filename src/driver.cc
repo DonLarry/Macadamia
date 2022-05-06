@@ -4,7 +4,7 @@
 #include <fstream>
 #include <iostream>
 
-driver::driver(/*std::ostream &out*/)
+driver::driver()
   : out(* new std::stringstream(std::ios_base::out)), trace_parsing(false), trace_scanning(false)
 {}
 
@@ -19,4 +19,11 @@ int driver::parse(const std::string& f)
   result = parser.parse();
   scan_end();
   return result;
+}
+
+driver::~driver()
+{
+  delete &out;
+  for (auto e : expressions)
+    delete e;
 }

@@ -120,9 +120,12 @@ struct driver;
 
 
 %left PLUS MINUS
+%left DOUBLESLASH
 %left STAR SLASH PERCENT
 
 // Non-terminal definitions
+
+%type <std::string> ValuableExpression
 
 %type <std::string> Number
 %type <Number*> LiteralNumber
@@ -134,6 +137,8 @@ struct driver;
 
 %type <std::string> Boolean
 %type <bool> LiteralBoolean
+
+%type <std::string> VarOperation
 
 // Built-in functions
 
@@ -177,34 +182,34 @@ PossibleExpression:
   NEWLINE {}
 
 Expression:
-  Number {}
+  ValuableExpression {}
   |
+  NonValuableExpression {}
+
+NonValuableExpression:
   Print {}
-  |
-  String {}
-  |
-  Boolean {}
   |
   VarDeclaration {}
 
+ValuableExpression:
+  Boolean {$$ = $1;}
+  |
+  Number {$$ = $1;}
+  |
+  String {$$ = $1;}
+  |
+  IDENTIFIER {$$ = $1;}
+  |
+  VarOperation {$$ = $1;}
 
 // Numbers
 
 Number:
-  LiteralNumber
-  {
-    $$ = $1->codegen();
-  }
+  LiteralNumber {$$ = $1->codegen();}
   |
-  Int
-  {
-    $$ = $1;
-  }
+  Int {$$ = $1;}
   |
-  Float
-  {
-    $$ = $1;
-  }
+  Float {$$ = $1;}
 //  |
 //  VarInteger
 //  {
@@ -212,20 +217,95 @@ Number:
 //  }
 
 LiteralNumber:
-  NUMBER {$$ = new IntegerNumber($1);}
+  NUMBER
+  {
+    auto num = new IntegerNumber($1);
+    drv.expressions.push_back(num);
+    $$ = num;
+  }
   |
-  NPFLOAT {$$ = new FloatNumber($1);}
+  NPFLOAT
+  {
+    auto num = new FloatNumber($1);
+    drv.expressions.push_back(num);
+    $$ = num;
+  }
   |
   LiteralNumberOperation
 
 LiteralNumberOperation:
-  LiteralNumber PLUS LiteralNumber {$$ = add(*$1, *$3);}
+  LiteralNumber PLUS LiteralNumber
+  {
+    auto r = add(*$1, *$3);
+    drv.expressions.push_back(r);
+    $$ = r;
+  }
   |
-  LiteralNumber MINUS LiteralNumber {$$ = sub(*$1, *$3);}
+  LiteralNumber MINUS LiteralNumber
+  {
+    auto r = sub(*$1, *$3);
+    drv.expressions.push_back(r);
+    $$ = r;
+  }
   |
-  LiteralNumber STAR LiteralNumber {$$ = mul(*$1, *$3);}
+  LiteralNumber STAR LiteralNumber
+  {
+    auto r = mul(*$1, *$3);
+    drv.expressions.push_back(r);
+    $$ = r;
+  }
   |
-  LiteralNumber SLASH LiteralNumber {$$ = div(*$1, *$3);}
+  LiteralNumber DOUBLESLASH LiteralNumber
+  {
+    auto r = div_floor(*$1, *$3);
+    drv.expressions.push_back(r);
+    $$ = r;
+  }
+  |
+  LiteralNumber PLUS Boolean
+  {
+    auto num = new IntegerNumber($3=="true");
+    drv.expressions.push_back(num);
+    auto r = add(*$1, *num);
+    drv.expressions.push_back(r);
+    $$ = r;
+  }
+  |
+  LiteralNumber MINUS Boolean
+  {
+    auto num = new IntegerNumber($3=="true");
+    drv.expressions.push_back(num);
+    auto r = sub(*$1, *num);
+    drv.expressions.push_back(r);
+    $$ = r;
+  }
+  |
+  LiteralNumber STAR Boolean
+  {
+    auto num = new IntegerNumber($3=="true");
+    drv.expressions.push_back(num);
+    auto r = mul(*$1, *num);
+    drv.expressions.push_back(r);
+    $$ = r;
+  }
+  |
+  LiteralNumber SLASH Boolean
+  {
+    auto num = new IntegerNumber($3=="true");
+    drv.expressions.push_back(num);
+    auto r = div(*$1, *num);
+    drv.expressions.push_back(r);
+    $$ = r;
+  }
+  |
+  LiteralNumber DOUBLESLASH Boolean
+  {
+    auto num = new IntegerNumber($3=="true");
+    drv.expressions.push_back(num);
+    auto r = div_floor(*$1, *num);
+    drv.expressions.push_back(r);
+    $$ = r;
+  }
 
 //VarInteger:
 //  // Some productions
@@ -233,23 +313,18 @@ LiteralNumberOperation:
 // Strings
 
 String:
-  LiteralString
-  {
-    $$ = $1->codegen();
-  }
+  LiteralString {$$ = $1->codegen();}
   |
-  VarStr
-  {
-    $$ = "str";
-  }
+  VarStr {$$ = "str";}
   |
-  Str
-  {
-    $$ = $1;
-  }
+  Str {$$ = $1;}
 
 LiteralString:
-  STRING {$$ = new String($1.substr(1, $1.size() - 2));}
+  STRING
+  {
+    auto str = new String($1.substr(1, $1.size() - 2));
+    $$ = str;
+  }
   |
   LiteralStringOperation
 
@@ -263,15 +338,9 @@ VarStr:
 // Booleans
 
 Boolean:
-  LiteralBoolean
-  {
-    $$ = ($1 ? "true" : "false");
-  }
+  LiteralBoolean {$$ = ($1 ? "true" : "false");}
   |
-  Bool
-  {
-    $$ = $1;
-  }
+  Bool {$$ = $1;}
 
 LiteralBoolean:
   TRUE {$$ = true;}
@@ -287,22 +356,7 @@ Print:
     drv.out << "std::cout << \"\\n\";" << std::endl;
   }
   |
-  PRINT LPAR Number RPAR
-  {
-    drv.out << "std::cout<<" << $3 << "<<std::endl;" << std::endl;
-  }
-  |
-  PRINT LPAR String RPAR
-  {
-    drv.out << "std::cout<<" << $3 << "<<std::endl;" << std::endl;
-  }
-  |
-  PRINT LPAR Boolean RPAR
-  {
-    drv.out << "std::cout<<" << $3 << "<<std::endl;" << std::endl;
-  }
-  |
-  PRINT LPAR IDENTIFIER RPAR
+  PRINT LPAR ValuableExpression RPAR
   {
     drv.out << "std::cout<<" << $3 << "<<std::endl;" << std::endl;
   }
@@ -535,6 +589,39 @@ VarDeclaration:
       exit(1);
     }
     drv.out << "std::string " << $1 << " = " << $5 << ";\n";
+  }
+
+VarOperation:
+  IDENTIFIER PLUS IDENTIFIER
+  {
+    auto a = drv.identifiers.find($1);
+    auto b = drv.identifiers.find($3);
+    if (a == drv.identifiers.end())
+    {
+      std::cerr << "Error: Variable " << $1 << " does not exist." << std::endl;
+      exit(1);
+    }
+    if (b == drv.identifiers.end())
+    {
+      std::cerr << "Error: Variable " << $3 << " does not exist." << std::endl;
+      exit(1);
+    }
+    if (a->second != b->second)
+    {
+      if (a->second == driver::Type::STRING)
+      {
+        // std::cerr << "line " << @2.begin << std::endl;
+        std::cerr << "TypeError: can only concatenate str (not \"" << drv.typeName(a->second) << "\") to str." << std::endl;
+        exit(1);
+      }
+      if (b->second == driver::Type::STRING)
+      {
+        // std::cerr << "line " << @2.begin << std::endl;
+        std::cerr << "TypeError: unsupported operand type(s) for +: \'" << drv.typeName(a->second) << "\' and \'str\'" << std::endl;
+        exit(1);
+      }
+    }
+    $$ = $1 + "+" + $3;
   }
 
 %%

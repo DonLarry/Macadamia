@@ -66,6 +66,28 @@ STRING          \"[^\n"]*\"
 /*Operadores, delimitadores*/
 WHITESPACE        [ \r]*
 NEWLINE           [\n]
+
+LEFTSHIFTEQUAL    "<<="
+RIGHTSHIFTEQUAL   ">>="
+DOUBLESTAREQUAL   "**="
+DOUBLESLASH       "//"
+DOUBLESLASHEQUAL  "//="
+RARROW            "->"
+
+EQEQUAL           "=="
+NOTEQUAL          "!="
+LESSEQUAL         "<="
+GREATEREQUAL      ">="
+DOUBLESTAR        "**"
+PLUSEQUAL         "+="
+MINEEQUAL         "-="
+STAREQUAL         "*="
+SLASHEQUAL        "/="
+PERCENTEQUAL      "%="
+AMPEREQUAL        "&="
+VBAREQUAL         "|="
+CIRCUMFLEXEQUAL   "^="
+
 PLUS              [+]
 MINUS             [-]
 STAR              [*]
@@ -88,26 +110,6 @@ LBRACE            "{"
 RBRACE            "}"
 TILDE             [~]
 CIRCUMFLEX        "^"
-EQEQUAL           "=="
-NOTEQUAL          "!="
-LESSEQUAL         "<="
-GREATEREQUAL      ">="
-DOUBLESTAR        "**"
-PLUSEQUAL         "+="
-MINEEQUAL         "-="
-STAREQUAL         "*="
-SLASHEQUAL        "/="
-PERCENTEQUAL      "%="
-AMPEREQUAL        "&="
-VBAREQUAL         "|="
-CIRCUMFLEXEQUAL   "^="
-LEFTSHIFTEQUAL    "<<="
-RIGHTSHIFTEQUAL   ">>="
-DOUBLESTAREQUAL   "**="
-DOUBLESLASH       "//"
-DOUBLESLASHEQUAL  "//="
-RARROW            "->"
-
 
 %%
 
