@@ -140,6 +140,8 @@ struct driver;
 
 %type <std::string> VarOperation
 
+%type <std::string> NormalPrintingNonTerminals
+
 // Built-in functions
 
 %type <String*> Input
@@ -164,11 +166,25 @@ Last: First Expressions
 
 First: %empty
 {
-  drv.out << "#include<iostream>" << std::endl;
-  drv.out << "int main() {" << std::endl;
-  drv.out << "std::string str;" << std::endl;
-  drv.out << "int integer;" << std::endl;
-  drv.out << "float floating;" << std::endl;
+  drv.out << "#include<iostream>\n";
+
+  drv.out << "bool to_bool(const bool &b) {return b;}\n";
+  drv.out << "bool to_bool(const int &i) {return i;}\n";
+  drv.out << "bool to_bool(const float &f) {return f;}\n";
+  drv.out << "bool to_bool(const std::string& s) {return !s.empty();}\n";
+
+  drv.out << "int to_int(const bool &b) {return b;}\n";
+  drv.out << "int to_int(const int &i) {return i;}\n";
+  drv.out << "int to_int(const float &f) {return f;}\n";
+  drv.out << "int to_int(const std::string& s) {return atoi(s.c_str());}\n";
+
+  drv.out << "float to_float(const bool &b) {return b;}\n";
+  drv.out << "float to_float(const int &i) {return i;}\n";
+  drv.out << "float to_float(const float &f) {return f;}\n";
+  drv.out << "float to_float(const std::string& s) {return atof(s.c_str());}\n";
+
+  drv.out << "int main() {\n";
+  drv.out << "std::string str;\n";
 }
 
 Expressions:
@@ -350,16 +366,31 @@ LiteralBoolean:
 
 // Built-in functions
 
+NormalPrintingNonTerminals:
+  Number {$$ = $1;}
+  |
+  String {$$ = $1;}
+  |
+  IDENTIFIER {$$ = $1;}
+  |
+  VarOperation {$$ = $1;}
+
 Print:
   PRINT LPAR RPAR
   {
     drv.out << "std::cout << \"\\n\";" << std::endl;
   }
   |
-  PRINT LPAR ValuableExpression RPAR
+  PRINT LPAR NormalPrintingNonTerminals RPAR
   {
     drv.out << "std::cout<<" << $3 << "<<std::endl;" << std::endl;
   }
+  |
+  PRINT LPAR Boolean RPAR
+  {
+    drv.out << "std::cout<<" << (($3=="true")?"True":"False") << "<<std::endl;" << std::endl;
+  }
+
 
 InputPrompt:
   %empty {}
@@ -415,6 +446,20 @@ Bool:
   {
     $$ = $3.empty() ? "false" : "true";
   }
+  |
+  BOOL_TYPE LPAR IDENTIFIER RPAR
+  {
+    auto r = drv.identifiers.find($3);
+    if (r == drv.identifiers.end())
+    {
+      std::cerr << "NameError: name \'" << $3 << "\' is not defined" << std::endl;
+      drv.exit(1);
+    }
+    if (r->second == driver::Type::STRING)
+      $$ = "!" + $3 + ".empty()";
+    else
+      $$ = "((bool)" + $3 + ")";
+  }
 
 Int:
   INT_TYPE LPAR LiteralBoolean RPAR
@@ -450,6 +495,25 @@ Int:
   INT_TYPE LPAR Str RPAR
   {
     $$ = std::to_string(atol($3.c_str()));
+  }
+  |
+  INT_TYPE LPAR IDENTIFIER RPAR
+  {
+    auto r = drv.identifiers.find($3);
+    if (r == drv.identifiers.end())
+    {
+      std::cerr << "NameError: name \'" << $3 << "\' is not defined" << std::endl;
+      drv.exit(1);
+    }
+    if (r->second == driver::Type::STRING)
+      $$ = "atoi(" + $3 + ".c_str())";
+    else
+      $$ = "((int)" + $3 + ")";
+  }
+  |
+  INT_TYPE LPAR VarOperation RPAR
+  {
+    $$ = "to_int(" + $3 + ")";
   }
 
 Float:
@@ -487,6 +551,25 @@ Float:
   {
     $$ = std::to_string(atof($3.c_str()));
   }
+  |
+  FLOAT_TYPE LPAR IDENTIFIER RPAR
+  {
+    auto r = drv.identifiers.find($3);
+    if (r == drv.identifiers.end())
+    {
+      std::cerr << "NameError: name \'" << $3 << "\' is not defined" << std::endl;
+      drv.exit(1);
+    }
+    if (r->second == driver::Type::STRING)
+      $$ = "atof(" + $3 + ".c_str())";
+    else
+      $$ = "((float)" + $3 + ")";
+  }
+  |
+  FLOAT_TYPE LPAR VarOperation RPAR
+  {
+    $$ = "to_float(" + $3 + ")";
+  }
 
 Str:
   STRING_TYPE LPAR LiteralBoolean RPAR
@@ -523,6 +606,16 @@ Str:
   {
     $$ = $3;
   }
+  |
+  STRING_TYPE LPAR IDENTIFIER RPAR
+  {
+    $$ = "std::to_string(" + $3 + ")";
+  }
+  |
+  STRING_TYPE LPAR VarOperation RPAR
+  {
+    $$ = "std::to_string(" + $3 + ")";
+  }
 
 VarDeclaration:
   IDENTIFIER COLON BOOL_TYPE EQUAL Boolean
@@ -531,7 +624,7 @@ VarDeclaration:
     if (!r.second)
     {
       std::cerr << "Error: Variable " << $1 << " already exists." << std::endl;
-      exit(1);
+      drv.exit(1);
     }
     drv.out << "bool " << $1 << " = " << $5 << ";\n";
   }
@@ -542,7 +635,7 @@ VarDeclaration:
     if (!r.second)
     {
       std::cerr << "Error: Variable " << $1 << " already exists." << std::endl;
-      exit(1);
+      drv.exit(1);
     }
     drv.out << "int " << $1 << " = " << *$5 << ";\n";
   }
@@ -553,7 +646,7 @@ VarDeclaration:
     if (!r.second)
     {
       std::cerr << "Error: Variable " << $1 << " already exists." << std::endl;
-      exit(1);
+      drv.exit(1);
     }
     drv.out << "int " << $1 << " = " << $5 << ";\n";
   }
@@ -564,7 +657,7 @@ VarDeclaration:
     if (!r.second)
     {
       std::cerr << "Error: Variable " << $1 << " already exists." << std::endl;
-      exit(1);
+      drv.exit(1);
     }
     drv.out << "float " << $1 << " = " << *$5 << ";\n";
   }
@@ -575,7 +668,7 @@ VarDeclaration:
     if (!r.second)
     {
       std::cerr << "Error: Variable " << $1 << " already exists." << std::endl;
-      exit(1);
+      drv.exit(1);
     }
     drv.out << "float " << $1 << " = " << $5 << ";\n";
   }
@@ -586,7 +679,7 @@ VarDeclaration:
     if (!r.second)
     {
       std::cerr << "Error: Variable " << $1 << " already exists." << std::endl;
-      exit(1);
+      drv.exit(1);
     }
     drv.out << "std::string " << $1 << " = " << $5 << ";\n";
   }
@@ -599,12 +692,12 @@ VarOperation:
     if (a == drv.identifiers.end())
     {
       std::cerr << "Error: Variable " << $1 << " does not exist." << std::endl;
-      exit(1);
+      drv.exit(1);
     }
     if (b == drv.identifiers.end())
     {
       std::cerr << "Error: Variable " << $3 << " does not exist." << std::endl;
-      exit(1);
+      drv.exit(1);
     }
     if (a->second != b->second)
     {
@@ -612,13 +705,13 @@ VarOperation:
       {
         // std::cerr << "line " << @2.begin << std::endl;
         std::cerr << "TypeError: can only concatenate str (not \"" << drv.typeName(a->second) << "\") to str." << std::endl;
-        exit(1);
+        drv.exit(1);
       }
       if (b->second == driver::Type::STRING)
       {
         // std::cerr << "line " << @2.begin << std::endl;
         std::cerr << "TypeError: unsupported operand type(s) for +: \'" << drv.typeName(a->second) << "\' and \'str\'" << std::endl;
-        exit(1);
+        drv.exit(1);
       }
     }
     $$ = $1 + "+" + $3;

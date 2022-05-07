@@ -52,6 +52,8 @@ struct driver
   int parse(const std::string& file);
   void scan_begin();
   void scan_end();
+  void deallocate_memory();
+  void exit(int exit_code);
 
   driver();
   ~driver();

@@ -21,9 +21,20 @@ int driver::parse(const std::string& f)
   return result;
 }
 
-driver::~driver()
+void driver::deallocate_memory()
 {
   delete &out;
   for (auto e : expressions)
     delete e;
+}
+
+void driver::exit(int exit_code)
+{
+  deallocate_memory();
+  std::exit(exit_code);
+}
+
+driver::~driver()
+{
+  deallocate_memory();
 }
