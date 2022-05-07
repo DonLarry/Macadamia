@@ -460,6 +460,16 @@ Bool:
     else
       $$ = "((bool)" + $3 + ")";
   }
+  |
+  BOOL_TYPE LPAR VarOperation RPAR
+  {
+    $$ = "to_bool(" + $3 + ")";
+  }
+  |
+  BOOL_TYPE LPAR Input RPAR
+  {
+    $$ = "to_bool(str)";
+  }
 
 Int:
   INT_TYPE LPAR LiteralBoolean RPAR
@@ -514,6 +524,11 @@ Int:
   INT_TYPE LPAR VarOperation RPAR
   {
     $$ = "to_int(" + $3 + ")";
+  }
+  |
+  INT_TYPE LPAR Input RPAR
+  {
+    $$ = "to_int(str)";
   }
 
 Float:
@@ -570,6 +585,11 @@ Float:
   {
     $$ = "to_float(" + $3 + ")";
   }
+  |
+  FLOAT_TYPE LPAR Input RPAR
+  {
+    $$ = "to_float(str)";
+  }
 
 Str:
   STRING_TYPE LPAR LiteralBoolean RPAR
@@ -615,6 +635,11 @@ Str:
   STRING_TYPE LPAR VarOperation RPAR
   {
     $$ = "std::to_string(" + $3 + ")";
+  }
+  |
+  STRING_TYPE LPAR Input RPAR
+  {
+    $$ = "str";
   }
 
 VarDeclaration:
@@ -683,6 +708,93 @@ VarDeclaration:
     }
     drv.out << "std::string " << $1 << " = " << $5 << ";\n";
   }
+  |
+  IDENTIFIER COLON BOOL_TYPE EQUAL VarOperation
+  {
+    auto r = drv.identifiers.emplace($1, driver::Type::BOOL);
+    if (!r.second)
+    {
+      std::cerr << "Error: Variable " << $1 << " already exists." << std::endl;
+      drv.exit(1);
+    }
+    drv.out << "bool " << $1 << " = " << $5 << ";\n";
+  }
+  |
+  IDENTIFIER COLON INT_TYPE EQUAL VarOperation
+  {
+    auto r = drv.identifiers.emplace($1, driver::Type::INT);
+    if (!r.second)
+    {
+      std::cerr << "Error: Variable " << $1 << " already exists." << std::endl;
+      drv.exit(1);
+    }
+    drv.out << "int " << $1 << " = " << $5 << ";\n";
+  }
+  |
+  IDENTIFIER COLON FLOAT_TYPE EQUAL VarOperation
+  {
+    auto r = drv.identifiers.emplace($1, driver::Type::FLOAT);
+    if (!r.second)
+    {
+      std::cerr << "Error: Variable " << $1 << " already exists." << std::endl;
+      drv.exit(1);
+    }
+    drv.out << "float " << $1 << " = " << $5 << ";\n";
+  }
+  |
+  IDENTIFIER COLON STRING_TYPE EQUAL VarOperation
+  {
+    auto r = drv.identifiers.emplace($1, driver::Type::STRING);
+    if (!r.second)
+    {
+      std::cerr << "Error: Variable " << $1 << " already exists." << std::endl;
+      drv.exit(1);
+    }
+    drv.out << "std::string " << $1 << " = " << $5 << ";\n";
+  }
+  IDENTIFIER COLON BOOL_TYPE EQUAL IDENTIFIER
+  {
+    auto r = drv.identifiers.emplace($1, driver::Type::BOOL);
+    if (!r.second)
+    {
+      std::cerr << "Error: Variable " << $1 << " already exists." << std::endl;
+      drv.exit(1);
+    }
+    drv.out << "bool " << $1 << " = " << $5 << ";\n";
+  }
+  |
+  IDENTIFIER COLON INT_TYPE EQUAL IDENTIFIER
+  {
+    auto r = drv.identifiers.emplace($1, driver::Type::INT);
+    if (!r.second)
+    {
+      std::cerr << "Error: Variable " << $1 << " already exists." << std::endl;
+      drv.exit(1);
+    }
+    drv.out << "int " << $1 << " = " << $5 << ";\n";
+  }
+  |
+  IDENTIFIER COLON FLOAT_TYPE EQUAL IDENTIFIER
+  {
+    auto r = drv.identifiers.emplace($1, driver::Type::FLOAT);
+    if (!r.second)
+    {
+      std::cerr << "Error: Variable " << $1 << " already exists." << std::endl;
+      drv.exit(1);
+    }
+    drv.out << "float " << $1 << " = " << $5 << ";\n";
+  }
+  |
+  IDENTIFIER COLON STRING_TYPE EQUAL IDENTIFIER
+  {
+    auto r = drv.identifiers.emplace($1, driver::Type::STRING);
+    if (!r.second)
+    {
+      std::cerr << "Error: Variable " << $1 << " already exists." << std::endl;
+      drv.exit(1);
+    }
+    drv.out << "std::string " << $1 << " = " << $5 << ";\n";
+  }
 
 VarOperation:
   IDENTIFIER PLUS IDENTIFIER
@@ -703,13 +815,11 @@ VarOperation:
     {
       if (a->second == driver::Type::STRING)
       {
-        // std::cerr << "line " << @2.begin << std::endl;
         std::cerr << "TypeError: can only concatenate str (not \"" << drv.typeName(a->second) << "\") to str." << std::endl;
         drv.exit(1);
       }
       if (b->second == driver::Type::STRING)
       {
-        // std::cerr << "line " << @2.begin << std::endl;
         std::cerr << "TypeError: unsupported operand type(s) for +: \'" << drv.typeName(a->second) << "\' and \'str\'" << std::endl;
         drv.exit(1);
       }
