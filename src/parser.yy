@@ -826,6 +826,74 @@ VarOperation:
     }
     $$ = $1 + "+" + $3;
   }
+  |
+  IDENTIFIER MINUS IDENTIFIER
+  {
+    auto a = drv.identifiers.find($1);
+    auto b = drv.identifiers.find($3);
+    if (a == drv.identifiers.end())
+    {
+      std::cerr << "Error: Variable " << $1 << " does not exist." << std::endl;
+      drv.exit(1);
+    }
+    if (b == drv.identifiers.end())
+    {
+      std::cerr << "Error: Variable " << $3 << " does not exist." << std::endl;
+      drv.exit(1);
+    }
+    $$ = $1 + "-" + $3;
+  }
+  |
+  IDENTIFIER STAR IDENTIFIER
+  {
+    auto a = drv.identifiers.find($1);
+    auto b = drv.identifiers.find($3);
+    if (a == drv.identifiers.end())
+    {
+      std::cerr << "Error: Variable " << $1 << " does not exist." << std::endl;
+      drv.exit(1);
+    }
+    if (b == drv.identifiers.end())
+    {
+      std::cerr << "Error: Variable " << $3 << " does not exist." << std::endl;
+      drv.exit(1);
+    }
+    $$ = $1 + "*" + $3;
+  }
+  |
+  IDENTIFIER SLASH IDENTIFIER
+  {
+    auto a = drv.identifiers.find($1);
+    auto b = drv.identifiers.find($3);
+    if (a == drv.identifiers.end())
+    {
+      std::cerr << "Error: Variable " << $1 << " does not exist." << std::endl;
+      drv.exit(1);
+    }
+    if (b == drv.identifiers.end())
+    {
+      std::cerr << "Error: Variable " << $3 << " does not exist." << std::endl;
+      drv.exit(1);
+    }
+    $$ = $1 + "/" + $3;
+  }
+  |
+  IDENTIFIER DOUBLESLASH IDENTIFIER
+  {
+    auto a = drv.identifiers.find($1);
+    auto b = drv.identifiers.find($3);
+    if (a == drv.identifiers.end())
+    {
+      std::cerr << "Error: Variable " << $1 << " does not exist." << std::endl;
+      drv.exit(1);
+    }
+    if (b == drv.identifiers.end())
+    {
+      std::cerr << "Error: Variable " << $3 << " does not exist." << std::endl;
+      drv.exit(1);
+    }
+    $$ = "to_int(" + $1 + "/" + $3 + ")";
+  }
 
 %%
 
